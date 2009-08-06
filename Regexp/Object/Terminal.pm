@@ -3,16 +3,14 @@ package Regexp::Object::Terminal;
 use Moose;
 extends 'Regexp::Object::State';
 
-use Moose::Util::TypeConstraints;
+my $next_id = 0;
+my @terminals;
 
-subtype 'Terminal'
-	=> as 'Object'
-	=> where { $_->can('match') };
-
-has 'terminal' => (
+has '_terminal_id' => (
 	is => 'ro',
-	isa => 'Terminal',
-	required => 1
+	isa => 'Int',
+	required => 1,
+	default => sub { return $next_id++; }
 );
 
 has 'next' => (
@@ -20,6 +18,14 @@ has 'next' => (
 	isa => 'Regexp::Object::State',
 	predicate => 'has_next'
 );
+
+sub terminal {
+	my ($self, $new) = @_;
+	if (defined $new) {
+		$terminals[$self->_terminal_id] = $new;
+	}
+	return $terminals[$self->_terminal_id];
+}
 
 sub transition {
 	my ($self, $input, $expected) = @_;

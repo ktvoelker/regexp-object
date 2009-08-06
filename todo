@@ -2,20 +2,6 @@
 TODO
 ====
 
-Fix the cloning problem: when you clone using Data::Dumper, even the
-terminals are cloned
-
-	One option: don't use objects to keep track of states, just use some sort
-	of table
-
-	Another option: don't refer to terminal objects by direct reference:
-	have an array of terminal objects lexically scoped to
-	Regexp::Object::Terminal, and only store the position of the object.
-
-	The second option is really easy, so do that first, with the first option
-	being moved to a later plan to generally make the system faster and less
-	ugly.
-
 Clean up the code
 	
 	Use more descriptive variable names
@@ -26,6 +12,12 @@ Clean up the code
 		later
 
 		Inconsistency in the way "next" / "_next" is set
+
+		The way Terminal avoids direct references to the user-defined terminal
+
+			There should be a more idiomatic way to do this with Moose
+
+			Perhaps weak references will work?
 
 Blog about it
 

@@ -21,10 +21,11 @@ use Regexp::Object::Terminal;
 sub terminal ($) {
 	my ($terminal) = @_;
 	my $y = Regexp::Object::Lambda->new;
-	return Regexp::Object::Terminal->new(
-			terminal => $terminal,
+	my $t = Regexp::Object::Terminal->new(
 			next => $y,
 			end => $y);
+	$t->terminal($terminal);
+	return $t;
 }
 
 sub _fix_item ($) {
