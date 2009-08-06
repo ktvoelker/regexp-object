@@ -9,8 +9,8 @@ use lib './';
 use Regexp::Object;
 use Regexp::Object::Test::Literal;
 
-my $foo = Literal->new('foo');
-my $bar = Literal->new('bar');
+my $foo = Regexp::Object::Test::Literal->new('foo');
+my $bar = Regexp::Object::Test::Literal->new('bar');
 
 is_deeply(
 	seq($foo, $bar)->match(qw/foo bar/),
@@ -44,7 +44,7 @@ is_deeply(
 
 is_deeply(
 	plus(capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
-	{ x => [[qw/foo bar/], [qw/foo bar/]],
+	{ x => [[qw/foo bar/], [qw/foo bar/]] },
 	'"foo bar foo bar" =~ /[x:: foo bar]+/'
 );
 
@@ -63,7 +63,7 @@ is_deeply(
 
 is_deeply(
 	count(0, 1, capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
-	[ $foo ],
+	[],
 	'"foo bar foo bar" =~ /[x:: foo bar]{0,1}/'
 );
 

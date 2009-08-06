@@ -2,9 +2,6 @@
 TODO
 ====
 
-Convert the tests in regexp-test into real tests using some unit testing
-library
-
 Fix the cloning problem: when you clone using Data::Dumper, even the
 terminals are cloned
 
