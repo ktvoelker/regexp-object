@@ -1,79 +1,125 @@
 #!/usr/bin/perl
 
-package Literal;
-
 use strict;
 use warnings;
 
-use Data::Dumper;
-$Data::Dumper::Indent = 1;
+use Test::More tests => 18;
 
 use lib './';
-
 use Regexp::Object;
-
-sub new {
-	my ($class, $literal) = @_;
-	return bless \$literal, $class;
-}
-
-sub match {
-	my ($self, $input) = @_;
-	return $input eq $$self ? $input : undef;
-}
-
-sub run {
-	my ($regexp, @input) = @_;
-	print "Regexp: ", Dumper($regexp);
-	my $capture = $regexp->match(@input);
-	if ($capture) {
-		print "Matched: ", Dumper($capture);
-	}
-	else {
-		print "Failed\n";
-	}
-}
+use Regexp::Object::Test::Literal;
 
 my $foo = Literal->new('foo');
 my $bar = Literal->new('bar');
 
-# run(seq($foo, $bar), 'foo', 'bar');
+is_deeply(
+	seq($foo, $bar)->match(qw/foo bar/),
+	{},
+	'"foo bar" =~ /foo bar/'
+);
 
-# run(capture('x', $foo, $bar), 'foo', 'bar');
+is_deeply(
+	capture('x', $foo, $bar)->match(qw/foo bar/),
+	{ x => [qw/foo bar/] },
+	'"foo bar" =~ /[x: foo bar]/'
+);
 
-# run(star(capture_all('x', $foo, $bar)), 'foo', 'bar', 'foo', 'bar');
+is_deeply(
+	star(capture_all('x', $foo, $bar))->match('foo', 'bar', 'foo', 'bar'),
+	{ x => [[qw/foo bar/], [qw/foo bar/]] },
+	'"foo bar foo bar" =~ /[x:: foo bar]*/'
+);
 
-# run(star(capture_all('x', $foo, $bar)));
+is_deeply(
+	star(capture_all('x', $foo, $bar))->match(),
+	{},
+	'"" =~ /[x:: foo bar]*/'
+);
 
-# run(plus(capture_all('x', $foo, $bar)));
+is_deeply(
+	plus(capture_all('x', $foo, $bar))->match(),
+	[ $foo ],
+	'"" =~ /[x:: foo bar]+/'
+);
 
-# run(plus(capture_all('x', $foo, $bar)), 'foo', 'bar', 'foo', 'bar');
+is_deeply(
+	plus(capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
+	{ x => [[qw/foo bar/], [qw/foo bar/]],
+	'"foo bar foo bar" =~ /[x:: foo bar]+/'
+);
 
-# run(plus(capture_all('x', $foo, $bar)), qw/foo bar/);
+is_deeply(
+	plus(capture_all('x', $foo, $bar))->match(qw/foo bar/),
+	{ x => [[qw/foo bar/]] },
+	'"foo bar" =~ /[x:: foo bar]+/'
+);
 
-# run(seq(capture('x', $foo, $bar), star(capture_all('y', $foo, $bar))),
-#		qw/foo bar foo bar/);
+is_deeply(
+	seq(capture('x', $foo, $bar), star(capture_all('y', $foo, $bar)))->
+		match(qw/foo bar foo bar/),
+	{ x => [qw/foo bar/], y => [[qw/foo bar/]] },
+	'"foo bar foo bar" =~ /[x: foo bar] [y:: foo bar]*/'
+);
 
-# run(count(0, 1, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+is_deeply(
+	count(0, 1, capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
+	[ $foo ],
+	'"foo bar foo bar" =~ /[x:: foo bar]{0,1}/'
+);
 
-# run(count(2, 2, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+is_deeply(
+	count(2, 2, capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
+	{ x => [[qw/foo bar/], [qw/foo bar/]] },
+	'"foo bar foo bar" =~ /[x:: foo bar]{2,2}/'
+);
 
-# run(count(1, 2, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+is_deeply(
+	count(1, 2, capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
+	{ x => [[qw/foo bar/], [qw/foo bar/]] },
+	'"foo bar foo bar" =~ /[x:: foo bar]{1,2}/'
+);
 
-# run(count(3, 4, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+is_deeply(
+	count(3, 4, capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
+	[ $foo ],
+	'"foo bar foo bar" =~ /[x:: foo bar]{3,4}/'
+);
 
-# run(count(1, 4, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+is_deeply(
+	count(1, 4, capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
+	{ x => [[qw/foo bar/], [qw/foo bar/]] },
+	'"foo bar foo bar" =~ /[x:: foo bar]{1,4}/'
+);
 
-# run(count(1, NO_BOUND, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+is_deeply(
+	count(1, NO_BOUND, capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
+	{ x => [[qw/foo bar/], [qw/foo bar/]] },
+	'"foo bar foo bar" =~ /[x:: foo bar]{1,}/'
+);
 
-# run(count(3, NO_BOUND, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+is_deeply(
+	count(3, NO_BOUND, capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
+	[ $foo ],
+	'"foo bar foo bar" =~ /[x:: foo bar]{3,}/'
+);
 
-# run(count(0, NO_BOUND, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+is_deeply(
+	count(0, NO_BOUND, capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
+	{ x => [[qw/foo bar/], [qw/foo bar/]] },
+	'"foo bar foo bar" =~ /[x:: foo bar]{0,}/'
+);
 
-# run(count(NO_BOUND, NO_BOUND, capture_all('x', $foo, $bar)),
-# 	qw/foo bar foo bar/);
+is_deeply(
+	count(NO_BOUND, NO_BOUND, capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
+	{ x => [[qw/foo bar/], [qw/foo bar/]] },
+	'"foo bar foo bar" =~ /[x:: foo bar]{,}/'
+);
 
-# run(count(NO_BOUND, 4, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+is_deeply(
+	count(NO_BOUND, 4, capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
+	{ x => [[qw/foo bar/], [qw/foo bar/]] },
+	'"foo bar foo bar" =~ /[x:: foo bar]{,4}/'
+);
 
 1;
 
