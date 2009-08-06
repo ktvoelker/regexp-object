@@ -1,0 +1,30 @@
+
+TODO
+====
+
+Record all the terminals which are called without input.
+
+	This should produce all the terminals which would have matched the next
+	input.
+
+Provide a third return value from _match given only in case of failure
+which contains the no-input terminals.
+
+Find a nice way to expose the failure information from match.
+
+Clean up the code
+	
+	Use more descriptive variable names
+
+	Fix the ugly parts of the State interface
+
+		Inconsistency about what is set during construction and what is set
+		later
+
+		Inconsistency in the way "next" / "_next" is set
+
+Convert the tests in regexp-test into real tests using some unit testing
+library
+
+Blog about it
+

@@ -1,0 +1,39 @@
+
+Regexp::Object
+==============
+
+exports:
+	terminal(object)
+	union(items)
+	seq(items)
+	star(items)
+	plus(items)
+	opt(items)
+	count(min, max, items)
+	NO_BOUND
+	capture(name, items)
+	capture_all(name, items)
+
+Regexp::Object::State
+
+	(captures, remaining_input) = _match(captures, inputs)
+	(captures, remaining_input) = match(inputs)
+	captures = match_all(inputs)
+
+	Regexp::Object::Terminal
+		attrs: terminal
+	
+	Regexp::Object::Union
+		attrs: objects
+	
+	Regexp::Object::Seq
+		attrs: objects
+	
+	Regexp::Object::Capture
+		attrs: name, object
+
+The interface for terminal objects
+
+	result = match(input)
+		returns undef if not a match
+

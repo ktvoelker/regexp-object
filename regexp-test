@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+
+package Literal;
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+
+use lib './';
+
+use Regexp::Object;
+
+sub new {
+	my ($class, $literal) = @_;
+	return bless \$literal, $class;
+}
+
+sub match {
+	my ($self, $input) = @_;
+	return $input eq $$self ? $input : undef;
+}
+
+sub run {
+	my ($regexp, @input) = @_;
+	print "Regexp: ", Dumper($regexp);
+	my $capture = $regexp->match(@input);
+	if ($capture) {
+		print "Matched: ", Dumper($capture);
+	}
+	else {
+		print "Failed\n";
+	}
+}
+
+my $foo = Literal->new('foo');
+my $bar = Literal->new('bar');
+
+# run(seq($foo, $bar), 'foo', 'bar');
+
+# run(capture('x', $foo, $bar), 'foo', 'bar');
+
+# run(star(capture_all('x', $foo, $bar)), 'foo', 'bar', 'foo', 'bar');
+
+# run(star(capture_all('x', $foo, $bar)));
+
+# run(plus(capture_all('x', $foo, $bar)));
+
+# run(plus(capture_all('x', $foo, $bar)), 'foo', 'bar', 'foo', 'bar');
+
+# run(plus(capture_all('x', $foo, $bar)), qw/foo bar/);
+
+# run(seq(capture('x', $foo, $bar), star(capture_all('y', $foo, $bar))),
+#		qw/foo bar foo bar/);
+
+# run(count(0, 1, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+
+# run(count(2, 2, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+
+# run(count(1, 2, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+
+# run(count(3, 4, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+
+# run(count(1, 4, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+
+# run(count(1, NO_BOUND, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+
+# run(count(3, NO_BOUND, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+
+# run(count(0, NO_BOUND, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+
+# run(count(NO_BOUND, NO_BOUND, capture_all('x', $foo, $bar)),
+# 	qw/foo bar foo bar/);
+
+# run(count(NO_BOUND, 4, capture_all('x', $foo, $bar)), qw/foo bar foo bar/);
+
+1;
+
