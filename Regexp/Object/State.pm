@@ -53,8 +53,9 @@ sub accepting {
 ##
 sub match {
 	my ($self, @input) = @_;
-	my ($capture, $remain) = $self->_match(\@input, {}, {}, {});
-	return undef unless $capture;
+	my $expected = [];
+	my ($capture, $remain) = $self->_match(\@input, {}, {}, {}, $expected);
+	return $expected unless $capture;
 	die if @$remain;
 	return $capture;
 }
@@ -84,15 +85,13 @@ sub clone {
 }
 
 sub _match {
-	my ($self, $input, $closed, $open, $open_all) = @_;
-	print STDERR "Entered state " . $self->id . " with input @$input\n";
+	my ($self, $input, $closed, $open, $open_all, $expected) = @_;
 	
 	##
 	# Close captures
 	##
 	my $end;
 	if ($end = $self->end_capture) {
-		print STDERR "Closing capture $end\n";
 		if ($open->{$end}) {
 			$closed->{$end} = $open->{$end};
 			delete $open->{$end};
@@ -101,17 +100,13 @@ sub _match {
 			push @{$closed->{$end}}, $open_all->{$end};
 			delete $open_all->{$end};
 		}
-		print STDERR "  Current captures: " .
-				join(' ', keys %$open, keys %$open_all) . "\n";
 	}
 
 	if ($self->accepting) {
 		if (@$input) {
-			print STDERR "Dead end\n";
 			return ();
 		}
 		else {
-			print STDERR "Accepting: " . join(' ', keys %$closed) . "\n";
 			return ($closed, $input);
 		}
 	}
@@ -127,7 +122,7 @@ sub _match {
 	##
 	my @input_all = @$input;
 	my ($input_head, @input_tail) = @input_all;
-	my @next_states_with_output = $self->transition($input_head);
+	my @next_states_with_output = $self->transition($input_head, $expected);
 
 	##
 	# For each of the next states, transition to that state. If it returns
@@ -162,7 +157,9 @@ sub _match {
 		# Call the next state.
 		##
 		my $next_input = defined $output ? \@input_tail : \@input_all;
-		my @args = ($next_input, $next_closed, $next_open, $next_open_all);
+		my @args = (
+				$next_input, $next_closed, $next_open, $next_open_all, $expected
+		);
 
 		if (@next_states_with_output > 1) {
 			my @result = $state->_match(@args);

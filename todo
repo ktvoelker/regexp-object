@@ -2,15 +2,22 @@
 TODO
 ====
 
-Record all the terminals which are called without input.
+Convert the tests in regexp-test into real tests using some unit testing
+library
 
-	This should produce all the terminals which would have matched the next
-	input.
+Fix the cloning problem: when you clone using Data::Dumper, even the
+terminals are cloned
 
-Provide a third return value from _match given only in case of failure
-which contains the no-input terminals.
+	One option: don't use objects to keep track of states, just use some sort
+	of table
 
-Find a nice way to expose the failure information from match.
+	Another option: don't refer to terminal objects by direct reference:
+	have an array of terminal objects lexically scoped to
+	Regexp::Object::Terminal, and only store the position of the object.
+
+	The second option is really easy, so do that first, with the first option
+	being moved to a later plan to generally make the system faster and less
+	ugly.
 
 Clean up the code
 	
@@ -22,9 +29,6 @@ Clean up the code
 		later
 
 		Inconsistency in the way "next" / "_next" is set
-
-Convert the tests in regexp-test into real tests using some unit testing
-library
 
 Blog about it
 

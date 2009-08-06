@@ -6,7 +6,7 @@ extends 'Regexp::Object::State';
 use Moose::Util::TypeConstraints;
 
 subtype 'Terminal'
-	=> as 'Item'
+	=> as 'Object'
 	=> where { $_->can('match') };
 
 has 'terminal' => (
@@ -22,9 +22,13 @@ has 'next' => (
 );
 
 sub transition {
-	my ($self, $input) = @_;
+	my ($self, $input, $expected) = @_;
 	die unless $self->has_next;
-	return () unless defined $input;
+	unless (defined $input) {
+		push @$expected, $self->terminal
+			unless grep { $_ == $self->terminal } @$expected;
+		return ();
+	}
 	my $result = $self->terminal->match($input);
 	return $result ? ([$result, $self->next]) : ();
 }
