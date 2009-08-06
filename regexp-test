@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 20;
 
 use lib './';
 use Regexp::Object;
@@ -119,6 +119,18 @@ is_deeply(
 	count(NO_BOUND, 4, capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
 	{ x => [[qw/foo bar/], [qw/foo bar/]] },
 	'"foo bar foo bar" =~ /[x:: foo bar]{,4}/'
+);
+
+is_deeply(
+	capture('x', opt($foo))->match(),
+	{ x => [] },
+	'"" =~ /[foo?]/'
+);
+
+is_deeply(
+	capture('x', opt($foo))->match(qw/foo/),
+	{ x => [qw/foo/] },
+	'"" =~ /[foo?]/'
 );
 
 1;
