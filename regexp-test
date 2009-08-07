@@ -159,33 +159,6 @@ is_deeply(
 	'"bar foo foo bar bar foo foo foo" =~ /[foo | bar]{3,}/'
 );
 
-my %dump;
-sub recdump {
-	my $item = shift;
-	my $type = ref $item;
-	if ($type) {
-		if (exists $dump{$item}) {
-			++$dump{$item};
-			return;
-		}
-		$dump{$item} = 1;
-		my @subitems;
-		if ($type eq 'HASH' || UNIVERSAL::isa($item, 'Regexp::Object::State')) {
-			@subitems = values %$item;
-		}
-		elsif ($type eq 'ARRAY') {
-			@subitems = @$item;
-		}
-		for my $subitem (@subitems) {
-			recdump($subitem);
-		}
-	}
-}
-recdump(count(3, NO_BOUND, capture_all('x', union($foo, $bar))));
-print join '', map { "$dump{$_} $_\n" } sort {
-	$dump{$a} <=> $dump{$b}
-} keys %dump;
-
 is_deeply(
 	count(3, NO_BOUND, capture_all('x', union($foo, $bar)))->
 		match(qw/bar foo foo bar bar foo foo foo/),
