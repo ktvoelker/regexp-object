@@ -2,8 +2,6 @@
 TODO
 ====
 
-Fix bugs indicated by broken tests
-
 Clean up the code
 	
 	Use more descriptive variable names
@@ -20,6 +18,9 @@ Clean up the code
 			There should be a more idiomatic way to do this with Moose
 
 			Perhaps weak references will work?
+
+Figure out why count doesn't work if we avoid making a clone in the first
+loop iteration.
 
 Blog about it
 
