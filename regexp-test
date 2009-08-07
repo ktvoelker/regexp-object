@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 23;
+use Test::More tests => 25;
 
 use lib './';
 use Regexp::Object;
@@ -98,6 +98,12 @@ is_deeply(
 );
 
 is_deeply(
+	count(2, NO_BOUND, capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
+	{ x => [[qw/foo bar/], [qw/foo bar/]] },
+	'"foo bar foo bar" =~ /[x:: foo bar]{1,}/'
+);
+
+is_deeply(
 	count(3, NO_BOUND, capture_all('x', $foo, $bar))->match(qw/foo bar foo bar/),
 	[ $foo ],
 	'"foo bar foo bar" =~ /[x:: foo bar]{3,}/'
@@ -142,6 +148,43 @@ is_deeply(
 	] },
 	'"bar foo foo bar bar foo foo foo" =~ /[foo | bar]{3,}/'
 );
+
+is_deeply(
+	count(2, NO_BOUND, capture_all('x', union($foo, $bar)))->
+		match(qw/bar foo foo bar bar foo foo foo/),
+	{ x => [
+		[qw/bar/], [qw/foo/], [qw/foo/],[qw/bar/],
+		[qw/bar/], [qw/foo/], [qw/foo/], [qw/foo/]
+	] },
+	'"bar foo foo bar bar foo foo foo" =~ /[foo | bar]{3,}/'
+);
+
+my %dump;
+sub recdump {
+	my $item = shift;
+	my $type = ref $item;
+	if ($type) {
+		if (exists $dump{$item}) {
+			++$dump{$item};
+			return;
+		}
+		$dump{$item} = 1;
+		my @subitems;
+		if ($type eq 'HASH' || UNIVERSAL::isa($item, 'Regexp::Object::State')) {
+			@subitems = values %$item;
+		}
+		elsif ($type eq 'ARRAY') {
+			@subitems = @$item;
+		}
+		for my $subitem (@subitems) {
+			recdump($subitem);
+		}
+	}
+}
+recdump(count(3, NO_BOUND, capture_all('x', union($foo, $bar))));
+print join '', map { "$dump{$_} $_\n" } sort {
+	$dump{$a} <=> $dump{$b}
+} keys %dump;
 
 is_deeply(
 	count(3, NO_BOUND, capture_all('x', union($foo, $bar)))->

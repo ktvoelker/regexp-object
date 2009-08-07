@@ -136,7 +136,7 @@ sub count {
 				my @clones;
 				if ($cur) {
 					for my $i (1 .. $cur) {
-						push @clones, ($i == 1 && $cur == $min ? $state : clone($state));
+						push @clones, clone($state);
 					}
 				}
 				push @seqs, seq(@clones);
