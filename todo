@@ -4,6 +4,14 @@ TODO
 
 Add support for non-input-consuming terminals
 
+	This will allow things like:
+
+		Something that always matches and returns a special value to indicate
+		what branch you went along
+
+		An alternative that always matches to something else that might fail,
+		so you can have a default return value for the failure case
+
 Write documentation in POD
 
 Clean up the code
