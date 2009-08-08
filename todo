@@ -2,6 +2,8 @@
 TODO
 ====
 
+Add support for non-input-consuming terminals
+
 Clean up the code
 	
 	Use more descriptive variable names
