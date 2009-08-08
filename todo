@@ -4,6 +4,8 @@ TODO
 
 Add support for non-input-consuming terminals
 
+Write documentation in POD
+
 Clean up the code
 	
 	Use more descriptive variable names
